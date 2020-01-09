@@ -1,10 +1,7 @@
 #detail {
   position: relative;
 }
-.backsider {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+#detail .backsider {
   text-decoration: none;
   width: 36px;
   height: 36px;
@@ -15,18 +12,108 @@
   border-radius: 50%;
   background-color: #dad9d985;
   box-sizing: border-box;
+  color: #ffffff;
+  margin-bottom: 20px;
 }
 
 #detail .headliner {
   position: relative;
   padding-top: 0;
+  height: 40vh;
 }
 
 #detail .pokemon__image {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  overflow: hidden;
+  transform: translateX(-50%) scale(2.5);
+}
+
+#detail .pokemon__description {
+  justify-content: unset;
+  padding: 40px 20px 0;
+}
+
+#detail .pokemon__name {
+  font-size: 32px;
+}
+
+#detail .pokemon__type {
+  font-size: 10px;
+  padding: 6px 9px;
+}
+
+#detail .container {
+  padding: 0 20px;
+}
+
+#detail .abouters {
+  margin-top: 30px;
+}
+#detail .abouters .pokemon__statvalue {
+  flex: 80%;
+  text-align: left;
+}
+
+#detail .pokemon__status {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+#detail .pokemon__statname {
+  text-transform: capitalize;
+  flex: 20%;
+  color: rgb(168, 170, 171);
+}
+#detail .pokemon__statvalue {
+  flex: 20%;
+  color: #252525;
+  text-align: center;
+}
+#detail .pokemon__statprogress {
+  flex: 60%;
+  height: 3px;
+  background-color: #f6f6f6;
+}
+
+.pokemon__catch {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  position: relative;
 }
-#detail .pokemon__image > img {
-  transform: scale(4);
+.pokemon__dialog {
+  width: 60vw;
+  height: 40vh;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  z-index: 1;
+}
+.pokemon__dialayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.pokemon__diatitle {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+.pokemon__dialabel {
+  font-weight: 500;
+  font-size: 14px;
+}
+.pokemon__diainput {
+  padding: 5px 16px;
+  border: 1px solid #f6f6f6;
+  height: 24px;
+  border-radius: 4px;
 }

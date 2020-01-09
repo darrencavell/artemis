@@ -9,18 +9,13 @@ const useInfiniteScroll = (callback) => {
   }, [])
 
   useEffect(() => {
-    console.log('useEffect ', isFetching)
     if (isFetching)
       callback()
     return
   }, [isFetching])
 
   function handleScroll() {
-    // console.log(window.innerHeight, document.documentElement.scrollTop === document.documentElement.offsetHeight)
-    console.log('current: ', window.innerHeight + document.documentElement.scrollTop)
-    console.log('goal: ', document.documentElement.offsetHeight)
-    if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight || isFetching) {
-      console.log('set is fetching called', isFetching)
+    if (window.innerHeight + document.documentElement.scrollTop >= (document.documentElement.offsetHeight - 10) || isFetching) {
       setIsFetching(true)
     }
     return

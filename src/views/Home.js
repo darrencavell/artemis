@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom'
 import React, { useState, useEffect, useRef } from 'react'
 
+import PokemonType from '../components/PokemonType'
+import PokemonImage from '../components/PokemonImage'
+
 import PokemonStore from '../stores/PokemonStore'
 import { fetchPokemon } from '../actions/PokemonAction'
 import { colorByPokemonType } from '../utils'
 import useInfiniteScrolling from '../utils/useInfiniteScrolling'
+
 import './Home.css'
 
 const Home = props => {
   const [pokemonLists, setPokemonLists] = useState([])
 
   const [isFetching, setIsFetching] = useInfiniteScrolling(fetchMorePokemon)
-  
   function fetchMorePokemon() {
     setTimeout(() => {
       fetchPokemon({ query: `?limit=${PokemonStore.data.limit}&offset=${PokemonStore.data.loaded}` })
@@ -19,10 +22,6 @@ const Home = props => {
     }, 2000)
   }
 
-  function updateFromStore() {
-    if(!isFetching)
-      setPokemonLists(prevState => prevState.concat(PokemonStore.getPokemon()))
-  }
   useEffect(() => {
     fetchPokemon()
     PokemonStore.on('change', updateFromStore)
@@ -30,25 +29,9 @@ const Home = props => {
       PokemonStore.removeListener('change', updateFromStore)
     }
   }, [])
-
-  const PokemonImage = props => {
-    const { sprites } = props
-
-    return (
-      <div className="pokemon__image">
-        <img src={sprites.front_default} alt={sprites.front_default} />
-      </div>
-    )
-  }
-
-  const PokemonType = props => {
-    const { types } = props
-    
-    return types.map(t => t.type.name).map(type => {
-      return (
-        <div key={`${name}-${type}`} className="pokemon__type" style={{ background: colorByPokemonType(type), color: 'white' }}>{type}</div>
-      )
-    })
+  function updateFromStore() {
+    if(!isFetching)
+      setPokemonLists(prevState => prevState.concat(PokemonStore.getPokemon()))
   }
 
   const PokemonCard = () => {
@@ -63,11 +46,13 @@ const Home = props => {
           className="pokemon-card"
           style={{ background: color }}
         >
-          <PokemonImage sprites={sprites} />
+          <PokemonImage
+            sprites={sprites} />
           <div className="pokemon__description">
             <div className="pokemon__name">{name}</div>
             <div className="pokemon__types">
-              <PokemonType types={types} />
+              <PokemonType
+                types={types} />
             </div>
           </div>
         </Link>
@@ -90,7 +75,8 @@ const Home = props => {
       <div className="swiper">
         <PokemonCard />
       </div>
-      <PokemonNotification isFetching={isFetching} />
+      <PokemonNotification
+        isFetching={isFetching} />
     </div>
   )
 }
