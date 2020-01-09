@@ -1,0 +1,9 @@
+#home {
+  padding: 0 15px;
+  background-color: rgb(252, 252, 252);	
+}
+
+#home .pokemon__image {
+  justify-content: flex-end;
+  align-items: flex-end;
+}

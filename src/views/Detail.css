@@ -1,0 +1,32 @@
+#detail {
+  position: relative;
+}
+.backsider {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  text-decoration: none;
+  width: 36px;
+  height: 36px;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: #dad9d985;
+  box-sizing: border-box;
+}
+
+#detail .headliner {
+  position: relative;
+  padding-top: 0;
+}
+
+#detail .pokemon__image {
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+#detail .pokemon__image > img {
+  transform: scale(4);
+}
