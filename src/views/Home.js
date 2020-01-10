@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import PokemonCard from '../components/PokemonCard'
 
 import PokemonStore from '../stores/PokemonStore'
+import { colorByPokemonType } from '../utils'
 import { fetchPokemon } from '../actions/PokemonAction'
 import useInfiniteScrolling from '../utils/useInfiniteScrolling'
 
@@ -16,7 +17,7 @@ const Home = props => {
     setTimeout(() => {
       fetchPokemon({ query: `?limit=${PokemonStore.data.limit}&offset=${PokemonStore.data.loaded}` })
       setIsFetching(false)
-    }, 2000)
+    }, 3000)
   }
 
   useEffect(() => {
@@ -33,18 +34,35 @@ const Home = props => {
 
   const PokemonNotification = props => {
     const { isFetching } = props
-
     const toggle = isFetching ? 'show' : 'hide'
+    
     return (
       <div className={`pokemon__notification ${toggle}`}>Fetching more pokemons...</div>
     )
+  }
+
+  const PokemonCardModified = props => {
+    const { pokemonLists } = props
+
+    return pokemonLists.map(pokemon => {
+      const { id, types } = pokemon
+      const color = colorByPokemonType(types[types.length - 1].type.name)
+
+      return (
+        <PokemonCard
+          key={id}
+          pokemon={pokemon}
+          color={color} />
+      )
+    })
   }
 
   return (
     <div id="home" className="layout">
       <h1 className="headliner">Artemis Pokedex</h1>
       <div className="swiper">
-        <PokemonCard pokemonLists={pokemonLists} />
+        <PokemonCardModified
+          pokemonLists={pokemonLists} />
       </div>
       <PokemonNotification
         isFetching={isFetching} />

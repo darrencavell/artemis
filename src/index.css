@@ -40,13 +40,13 @@ button {
 }
 
 .pokemon-card {
-  flex: 0 calc(50% - 15px);
+  flex: 0 calc(50% - 7.5px);
   flex-wrap: wrap;
   border-radius: 12px;
   margin: 0 15px 15px 0;
   position: relative;
 }
-.pokemon-card:nth-child(2) {
+.pokemon-card:nth-child(2n) {
   margin: 0 0 15px 0;
 }
 .pokemon__description {
@@ -64,6 +64,7 @@ button {
   color: #ffffff;
   font-weight: 500;
   font-size: 12px;
+  text-decoration: underline;
 }
 .pokemon__catchdate {
   color: #ffffff;

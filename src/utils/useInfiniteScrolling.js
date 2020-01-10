@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 
 const useInfiniteScroll = (callback) => {
   const [isFetching, setIsFetching] = useState(false)
+  let timeout
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll)
@@ -15,8 +16,11 @@ const useInfiniteScroll = (callback) => {
   }, [isFetching])
 
   function handleScroll() {
+    clearTimeout(timeout)
     if (window.innerHeight + document.documentElement.scrollTop >= (document.documentElement.offsetHeight - 10) || isFetching) {
-      setIsFetching(true)
+      timeout = setTimeout(() => {
+        setIsFetching(true)
+      }, 2000)
     }
     return
   }

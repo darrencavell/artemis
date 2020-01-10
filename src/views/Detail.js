@@ -7,7 +7,7 @@ import PokemonModal from '../components/PokemonModal'
 import PokemonButton from '../components/PokemonButton'
 
 import PokemonStore from '../stores/PokemonStore'
-import { colorByPokemonType } from '../utils'
+import { colorTransform, colorByPokemonType } from '../utils'
 import { fetchPokemonDetail, tamePokemon } from '../actions/PokemonAction'
 
 import './Detail.css'
@@ -84,19 +84,32 @@ const Detail = props => {
 
   const PokemonCatch = props => {
     const { pokemonDetail, isButtonClicked, setIsButtonClicked, types } = props
+    const [name, setName] = useState('')
+    const color = colorTransform(colorByPokemonType(types[types.length - 1].type.name), 20)
 
     return isButtonClicked ? (
       <PokemonModal id="modal">
         <div className="pokemon__catch">
           <div className="pokemon__dialayer" onClick={() => setIsButtonClicked(false)}></div>
           <div className="pokemon__dialog">
-            <div className="pokemon__diatitle">{ isCaught ? 'Pokemon is caught...' : 'Pokemon failed to catch...'}</div>
-            <label className="pokemon__dialabel">Pokemon Nickname</label>
-            <input className="pokemon__diainput"></input>
+            {isCaught ? (
+              <>
+                <div className="pokemon__diatitle" style={{ color }}>Pokemon is caught...</div>
+                <label className="pokemon__dialabel">Pokemon Nickname</label>
+                <input className="pokemon__diainput" onChange={e => setName(e.target.value)}></input>
+              </>
+            ) : (
+              <>
+                <div className="pokemon__diatitle" style={{ color }}>UH OH!</div>
+                <div className="pokemon__diatitle">Pokemon failed to catch...</div>
+              </>
+            )}
             <PokemonButton
-              types={types}
-              callback={() => tamePokemon({ detail: pokemonDetail, nickname: 'tom', catch_date: new Date().getTime() })}>
-                Save
+              color={color}
+              callback={() => isCaught
+                ? (tamePokemon({ detail: pokemonDetail, nickname: name, catch_date: new Date().getTime() }), setIsButtonClicked(false))
+                : setIsButtonClicked(false)}>
+                OK
             </PokemonButton>
           </div>
         </div>
@@ -109,10 +122,8 @@ const Detail = props => {
     const chances = Math.random()
     
     if (chances <= 0.5) {
-      console.log('Pokemon is caught...')
       setIsCaught(true)
     } else {
-      console.log('Pokemon failed to catch...')
       setIsCaught(false)
     }
   }
@@ -149,7 +160,7 @@ const Detail = props => {
             isButtonClicked={isButtonClicked}
             setIsButtonClicked={setIsButtonClicked} />
           <PokemonButton
-            types={types}
+            color={colorTransform(colorByPokemonType(types[types.length - 1].type.name), 20)}
             callback={catchPokemon}>
               Catch Now!
           </PokemonButton>

@@ -25,6 +25,13 @@ class PokemonStore extends EventEmitter {
       idb: undefined
     }
   }
+  /**
+   * `Singleton Alike`
+   * - removing the need to use openDB function all the time,
+   *   when needed to use IndexedDB
+   * - return the existing IndexedDB if exists
+   * @link https://github.com/jakearchibald/idb
+   */
   async getIdb() {
     if (this.indexedDB.idb) {
       return this.indexedDB.idb
@@ -38,32 +45,57 @@ class PokemonStore extends EventEmitter {
     })
     return this.indexedDB.idb
   }
+  /**
+   * `Tame Pokemon`
+   * - basically just a bunch of crud operations,
+   *   before taming the pokemon, we kindly check the IndexedDB
+   * - afterwards, if it returns undefined, we create
+   *   an array and put the object there
+   * - if it was not undefined, we push the object immediatelly
+   * @param {Object} detail 
+   * @param {String} nickname 
+   * @param {UNIX Timestamp} catch_date 
+   */
   async tamePokemon(detail, nickname, catch_date) {
     this.indexedDB.idb = await this.getIdb()
     const existingDetail = await this.indexedDB.idb.get('artemis', [detail.id, detail.name])
-    if (existingDetail == undefined) {
-      const newDetail = Object.assign({}, detail)
-      newDetail['owned'] = [{ nickname, catch_date }]
-      this.indexedDB.idb.put('artemis', newDetail)
-      return
-    }
-    const newDetail = Object.assign({}, existingDetail)
-    newDetail['owned'].push({ nickname, catch_date })
+    const newDetail = Object.assign({}, detail)
+    existingDetail == undefined
+      ? newDetail['owned'] = [{ nickname, catch_date }]
+      : newDetail['owned'].push({ nickname, catch_date })
     this.indexedDB.idb.put('artemis', newDetail)
+  }
+  /**
+   * `Untame Pokemon`
+   * - most likely the same with tame pokemon,
+   *   but here, we don't delete the object immediately
+   * - we filter it, to map through the owned object,
+   *   if the nickname exists, we filter it
+   * - if there is 0 elements left, we delete the oject
+   *   from IndexedDB
+   * @param {Integer} id 
+   * @param {String} name 
+   * @param {String} nickname 
+   */
+  async untamePokemon(id, name, nickname) {
+    this.indexedDB.idb = await this.getIdb()
+    const existingDetail = await this.indexedDB.idb.get('artemis', [id, name])
+    if (existingDetail !== undefined) {
+      const newDetail = Object.assign({}, existingDetail)
+      newDetail['owned'] = newDetail['owned'].filter(f => f.nickname !== nickname)
+      newDetail['owned'].length === 0
+        ? await this.indexedDB.idb.delete('artemis', [id, name])
+        : await this.indexedDB.idb.put('artemis', newDetail)
+      this.emit('delete')
+    }
   }
   async getTamePokemonFromIdbAsync() {
     this.indexedDB.idb = await this.getIdb()
-    console.log(this.indexedDB.idb)
     this.data.tamedPokemon = await this.indexedDB.idb.getAll('artemis')
     this.emit('change')
   }
   getTamePokemon() {
     return this.data.tamedPokemon
-  }
-  async untamePokemon(id, name) {
-    this.indexedDB.idb = await this.getIdb()
-    const existingDetail = await this.indexedDB.idb.get('artemis', [id, name])
-
   }
   fetchPokemon(query = `?limit=${this.data.limit}`) {
     axios.get(`https://pokeapi.co/api/v2/pokemon${query}`)
@@ -106,7 +138,7 @@ class PokemonStore extends EventEmitter {
         this.tamePokemon(action.detail, action.nickname, action.catch_date)
         break
       case UNTAME_POKEMON:
-        this.untamePokemon(action.id, action.name)
+        this.untamePokemon(action.id, action.name, action.nickname)
         break
       case FETCH_POKEMON:
         this.fetchPokemon(action.query)
