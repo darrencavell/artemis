@@ -1,13 +1,3 @@
-#home {
-  padding: 0 20px;
-  background-color: rgb(252, 252, 252);	
-}
-
-#home .swiper {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 #home .pokemon__image {
   height: 140px;
   justify-content: flex-end;

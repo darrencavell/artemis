@@ -8,6 +8,7 @@ import {
 
 import Home from './views/Home'
 import Detail from './views/Detail'
+import Pokedex from './views/Pokedex'
 
 import './index.css'
 
@@ -22,6 +23,7 @@ function App() {
     <Router>
       <Switch>
         <Route path="/" exact component={Home} />
+        <Route path="/pokedex" component={Pokedex} />
         <Route path={`/:searchedPokemon`} component={Detail} />
       </Switch>
     </Router>

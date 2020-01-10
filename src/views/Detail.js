@@ -4,13 +4,13 @@ import React, { useState, useEffect } from 'react'
 import PokemonType from '../components/PokemonType'
 import PokemonImage from '../components/PokemonImage'
 import PokemonModal from '../components/PokemonModal'
+import PokemonButton from '../components/PokemonButton'
 
 import PokemonStore from '../stores/PokemonStore'
 import { colorByPokemonType } from '../utils'
-import { fetchPokemonDetail } from '../actions/PokemonAction'
+import { fetchPokemonDetail, tamePokemon } from '../actions/PokemonAction'
 
 import './Detail.css'
-import PokemonButton from '../components/PokemonButton'
 
 const Detail = props => {
   const { searchedPokemon } = props.match.params
@@ -83,7 +83,7 @@ const Detail = props => {
   }
 
   const PokemonCatch = props => {
-    const { isButtonClicked, setIsButtonClicked, types } = props
+    const { pokemonDetail, isButtonClicked, setIsButtonClicked, types } = props
 
     return isButtonClicked ? (
       <PokemonModal id="modal">
@@ -95,7 +95,7 @@ const Detail = props => {
             <input className="pokemon__diainput"></input>
             <PokemonButton
               types={types}
-              callback={() => {}}>
+              callback={() => tamePokemon({ detail: pokemonDetail, nickname: 'tom', catch_date: new Date().getTime() })}>
                 Save
             </PokemonButton>
           </div>
@@ -145,6 +145,7 @@ const Detail = props => {
             abilities={abilities} />
           <PokemonCatch
             types={types}
+            pokemonDetail={pokemonDetail}
             isButtonClicked={isButtonClicked}
             setIsButtonClicked={setIsButtonClicked} />
           <PokemonButton

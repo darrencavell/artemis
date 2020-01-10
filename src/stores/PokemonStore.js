@@ -1,8 +1,11 @@
 import axios from 'axios'
 import { EventEmitter } from 'events'
+import { openDB } from 'idb'
 
 import dispatcher from '../dispatcher'
 import {
+  UNTAME_POKEMON,
+  TAME_POKEMON,
   FETCH_POKEMON,
   FETCH_POKEMON_DETAIL
 } from '../constants'
@@ -14,8 +17,53 @@ class PokemonStore extends EventEmitter {
       loaded: 0,
       limit: 10,
       pokemon: [],
-      detail: {}
+      detail: {},
+      tamedPokemon: []
     }
+    this.indexedDB = {
+      version: 1,
+      idb: undefined
+    }
+  }
+  async getIdb() {
+    if (this.indexedDB.idb) {
+      return this.indexedDB.idb
+    }
+    this.indexedDB.idb = await openDB('artemis', this.indexedDB.version, {
+      upgrade(db) {
+        db.createObjectStore('artemis', {
+          keyPath: ['id', 'name']
+        })
+      }
+    })
+    return this.indexedDB.idb
+  }
+  async tamePokemon(detail, nickname, catch_date) {
+    this.indexedDB.idb = await this.getIdb()
+    const existingDetail = await this.indexedDB.idb.get('artemis', [detail.id, detail.name])
+    if (existingDetail == undefined) {
+      const newDetail = Object.assign({}, detail)
+      newDetail['owned'] = [{ nickname, catch_date }]
+      this.indexedDB.idb.put('artemis', newDetail)
+      return
+    }
+    const newDetail = Object.assign({}, existingDetail)
+    newDetail['owned'].push({ nickname, catch_date })
+    this.indexedDB.idb.put('artemis', newDetail)
+  }
+  async getTamePokemonFromIdbAsync() {
+    this.indexedDB.idb = await this.getIdb()
+    console.log(this.indexedDB.idb)
+    this.data.tamedPokemon = await this.indexedDB.idb.getAll('artemis')
+    this.emit('change')
+  }
+  getTamePokemon() {
+    return this.data.tamedPokemon
+  }
+  async untamePokemon(id, name) {
+    this.indexedDB.idb = await this.getIdb()
+    const existingDetail = await this.indexedDB.idb.get('artemis', [id, name])
+
   }
   fetchPokemon(query = `?limit=${this.data.limit}`) {
     axios.get(`https://pokeapi.co/api/v2/pokemon${query}`)
@@ -38,7 +86,6 @@ class PokemonStore extends EventEmitter {
     return this.data.pokemon
   }
   fetchPokemonDetail(searchedPokemon) {
-    console.log(searchedPokemon)
     axios.get(`https://pokeapi.co/api/v2/pokemon/${searchedPokemon}`)
       .then(response => {
         const { status, data } = response
@@ -54,8 +101,13 @@ class PokemonStore extends EventEmitter {
     return this.data.detail
   }
   handleActions(action) {
-    console.log(action)
     switch(action.type) {
+      case TAME_POKEMON:
+        this.tamePokemon(action.detail, action.nickname, action.catch_date)
+        break
+      case UNTAME_POKEMON:
+        this.untamePokemon(action.id, action.name)
+        break
       case FETCH_POKEMON:
         this.fetchPokemon(action.query)
         break

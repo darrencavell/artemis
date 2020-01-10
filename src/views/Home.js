@@ -1,12 +1,9 @@
-import { Link } from 'react-router-dom'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import PokemonType from '../components/PokemonType'
-import PokemonImage from '../components/PokemonImage'
+import PokemonCard from '../components/PokemonCard'
 
 import PokemonStore from '../stores/PokemonStore'
 import { fetchPokemon } from '../actions/PokemonAction'
-import { colorByPokemonType } from '../utils'
 import useInfiniteScrolling from '../utils/useInfiniteScrolling'
 
 import './Home.css'
@@ -34,32 +31,6 @@ const Home = props => {
       setPokemonLists(prevState => prevState.concat(PokemonStore.getPokemon()))
   }
 
-  const PokemonCard = () => {
-    return pokemonLists.map((pokemon, index) => {
-      const { id, name, sprites, types} = pokemon
-      
-      const color = colorByPokemonType(types[types.length - 1].type.name)
-      return (
-        <Link
-          key={id}
-          to={`/${name}`}
-          className="pokemon-card"
-          style={{ background: color }}
-        >
-          <PokemonImage
-            sprites={sprites} />
-          <div className="pokemon__description">
-            <div className="pokemon__name">{name}</div>
-            <div className="pokemon__types">
-              <PokemonType
-                types={types} />
-            </div>
-          </div>
-        </Link>
-      )
-    })
-  }
-
   const PokemonNotification = props => {
     const { isFetching } = props
 
@@ -70,10 +41,10 @@ const Home = props => {
   }
 
   return (
-    <div id="home">
+    <div id="home" className="layout">
       <h1 className="headliner">Artemis Pokedex</h1>
       <div className="swiper">
-        <PokemonCard />
+        <PokemonCard pokemonLists={pokemonLists} />
       </div>
       <PokemonNotification
         isFetching={isFetching} />

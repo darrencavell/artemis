@@ -18,6 +18,11 @@ button {
   border: 0;
 }
 
+.layout {
+  padding: 0 20px;
+  background-color: rgb(252, 252, 252);	
+}
+
 .headliner {
   padding-top: 60px;
   margin-bottom: 40px;
@@ -29,13 +34,17 @@ button {
   flex-direction: column;
 }
 
+.swiper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .pokemon-card {
   flex: 0 calc(50% - 15px);
   flex-wrap: wrap;
   border-radius: 12px;
   margin: 0 15px 15px 0;
   position: relative;
-  overflow: hidden;
 }
 .pokemon-card:nth-child(2) {
   margin: 0 0 15px 0;
@@ -50,6 +59,16 @@ button {
   text-transform: capitalize;
   font-weight: bold;
   font-size: 14px;
+}
+.pokemon__nickname {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 12px;
+}
+.pokemon__catchdate {
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 12px;
 }
 .pokemon__types {
   display: flex;

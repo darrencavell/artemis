@@ -1,0 +1,25 @@
+#pokedex .pokemon__image {
+  height: 140px;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+#pokedex .pokemon__description {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+}
+
+#pokedex .pokemon__button {
+  margin-top: unset;
+  width: unset;
+  padding: unset;
+  font-size: 12px;
+  position: absolute;
+  top: -32px;
+  right: -37px;
+  width: 36px;
+  height: 36px;
+  z-index: 2;
+}
