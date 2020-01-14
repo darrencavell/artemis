@@ -9,7 +9,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, './build'),
     filename: 'bundle[chunkhash:4].js',
-    publicPath: '/assets'
+    publicPath: '/assets/'
   },
   mode: 'production',
   module: {
@@ -39,7 +39,7 @@ module.exports = {
     new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       template: "./src/index.html",
-      filename: "./index.html"
+      filename: "index.html"
     }),
     new WorkboxWebpackPlugin.InjectManifest({
       swSrc: "./src/sw-src.js",
