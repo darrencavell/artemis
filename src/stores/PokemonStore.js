@@ -15,9 +15,10 @@ class PokemonStore extends EventEmitter {
     super()
     this.data = {
       loaded: 0,
-      limit: 10,
+      limit: 4,
       pokemon: [],
-      detail: {},
+      fetchedPokemon: [],
+      fetchedDetail: {},
       tamedPokemon: []
     }
     this.indexedDB = {
@@ -59,11 +60,15 @@ class PokemonStore extends EventEmitter {
   async tamePokemon(detail, nickname, catch_date) {
     this.indexedDB.idb = await this.getIdb()
     const existingDetail = await this.indexedDB.idb.get('artemis', [detail.id, detail.name])
-    const newDetail = Object.assign({}, detail)
-    existingDetail == undefined
-      ? newDetail['owned'] = [{ nickname, catch_date }]
-      : newDetail['owned'].push({ nickname, catch_date })
-    this.indexedDB.idb.put('artemis', newDetail)
+    if (existingDetail == undefined) {
+      const newDetail = Object.assign({}, detail)
+      newDetail['owned'] = [{ nickname, catch_date }]
+      this.indexedDB.idb.put('artemis', newDetail)
+    } else {
+      const modifiedExistingDetail = Object.assign({}, existingDetail)
+      modifiedExistingDetail['owned'].push({ nickname, catch_date })
+      this.indexedDB.idb.put('artemis', modifiedExistingDetail)
+    }
   }
   /**
    * `Untame Pokemon`
@@ -108,13 +113,17 @@ class PokemonStore extends EventEmitter {
         const { results } = data
         axios.all(results.map(pokemon => axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)))
           .then(response => {
-            this.data.loaded += this.data.limit
-            this.data.pokemon = response.map(r => r.data)
+            this.data.loaded += response.length
+            this.data.fetchedPokemon = response.map(r => r.data)
+            this.data.pokemon = this.data.pokemon.concat(this.data.fetchedPokemon)
             this.emit('change')
           })
       })
   }
   getPokemon() {
+    return this.data.fetchedPokemon
+  }
+  getExistingPokemon() {
     return this.data.pokemon
   }
   fetchPokemonDetail(searchedPokemon) {
@@ -125,12 +134,12 @@ class PokemonStore extends EventEmitter {
           console.error(`Looks like there is a problem. Status: ${status}`)
         }
 
-        this.data.detail = data
+        this.data.fetchedDetail = data
         this.emit('change')
       })
   }
   getPokemonDetail() {
-    return this.data.detail
+    return this.data.fetchedDetail
   }
   handleActions(action) {
     switch(action.type) {

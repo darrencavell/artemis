@@ -1,11 +1,24 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 
 const PokemonImage = props => {
-  const { sprites } = props
+  const { isLazy, observer, src } = props
+  const imageRef = useRef()
+
+  if (isLazy) {
+    useEffect(() => {
+      const { current } = imageRef
+      if (observer) {
+        observer.observe(current)
+      }
+      return () => {
+        observer.unobserve(current)
+      }
+    }, [observer])
+  }
 
   return (
     <div className="pokemon__image">
-      <img src={sprites.front_default} alt={sprites.front_default} />
+      <img ref={imageRef} src={isLazy ? '' : src} data-src={src} alt={src.toString()} />
     </div>
   )
 }

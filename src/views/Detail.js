@@ -144,7 +144,7 @@ const Detail = props => {
             </div>
           </div>
           <PokemonImage
-            sprites={sprites} />
+            src={sprites.front_default} />
         </div>
         <div className="container">
           <PokemonStatus

@@ -66,3 +66,13 @@ export function colorTransform(col, amt) {
 
   return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
 }
+
+export function createObserver(inViewCallback = noop, newOptions = {}) {  
+  const defaultOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.3
+  }
+  
+  return new IntersectionObserver(inViewCallback, Object.assign(defaultOptions, newOptions))
+}

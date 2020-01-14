@@ -10,8 +10,9 @@ const useInfiniteScroll = (callback) => {
   }, [])
 
   useEffect(() => {
-    if (isFetching)
+    if (isFetching) {
       callback()
+    }
     return
   }, [isFetching])
 
@@ -20,12 +21,16 @@ const useInfiniteScroll = (callback) => {
     if (window.innerHeight + document.documentElement.scrollTop >= (document.documentElement.offsetHeight - 10) || isFetching) {
       timeout = setTimeout(() => {
         setIsFetching(true)
-      }, 2000)
+      }, 1000)
     }
     return
   }
 
-  return [isFetching, setIsFetching]
+  function clear() {
+    clearTimeout(timeout)
+  }
+
+  return [isFetching, setIsFetching, clear]
 }
 
 export default useInfiniteScroll

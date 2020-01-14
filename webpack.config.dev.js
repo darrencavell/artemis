@@ -40,6 +40,16 @@ module.exports = {
         use: {
           loader: "css-loader"
         }
+      },
+      {
+        test: /\.(jpg|jpeg|png)(\?.*)?$/,
+        use: {
+          loader: 'file-loader', 
+          options: {
+            name: '[name][md5:hash].[ext]',
+            publicPath: '/'
+          }
+        }
       }
     ]
   },

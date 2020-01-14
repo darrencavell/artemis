@@ -2,6 +2,7 @@
   height: 140px;
   justify-content: flex-end;
   align-items: flex-end;
+  overflow: hidden;
 }
 
 #home .pokemon__description {

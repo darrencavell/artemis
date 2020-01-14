@@ -1,22 +1,42 @@
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import PokemonCard from '../components/PokemonCard'
 import PokemonButton from '../components/PokemonButton'
 
 import PokemonStore from '../stores/PokemonStore'
-import { colorByPokemonType, colorTransform } from '../utils'
+import { colorByPokemonType, colorTransform, createObserver } from '../utils'
 import { untamePokemon } from '../actions/PokemonAction'
 
 import './Pokedex.css'
 
 const Pokedex = props => {
+  const history = useHistory()
   const [tamedPokemonLists, setTamedPokemonLists] = useState([])
+  const [imageObserver, setImageObserver] = useState(null)
+
+  function onImageInView(entries, observer) {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const element = entry.target
+        const imageSrc = element.getAttribute('data-src')
+        
+        element.removeAttribute('data-src')
+        element.setAttribute('src', imageSrc)
+        
+        observer.unobserve(element)
+      } 
+    })
+  }
 
   useEffect(() => {
     PokemonStore.getTamePokemonFromIdbAsync()
     PokemonStore.on('change', getTamedPokemonFromStore)
     PokemonStore.on('delete', deletedTamePokemonFromStore)
+    const imageObserver = createObserver(onImageInView) 
+    setImageObserver(imageObserver)
     return () => {
+      imageObserver.disconnect()
       PokemonStore.removeListener('change', getTamedPokemonFromStore)
       PokemonStore.removeListener('delete', deletedTamePokemonFromStore)
     }
@@ -32,20 +52,21 @@ const Pokedex = props => {
     const { tamedPokemonLists } = props
 
     return tamedPokemonLists.map(pokemon => {
-      const { id, types } = pokemon
+      const { id, types, name } = pokemon
       const color = colorByPokemonType(types[types.length - 1].type.name)
 
       return pokemon.owned.map(o => {
-        console.log(o, pokemon, color)
         return (
           <PokemonCard
-            key={id}
+            key={`${id}-${o.catch_date}`}
             pokemon={pokemon}
             color={color}
+            callback={() => history.push(`/${name}`)}
+            observer={imageObserver}
             additional={pokemon => {
               const { id, name, types } = pokemon
               const color = colorByPokemonType(types[types.length - 1].type.name)
-  
+
               return (
                 <PokemonButton
                   color={colorTransform(color, 20)}
@@ -55,7 +76,6 @@ const Pokedex = props => {
               )
             }}
             minibar={() => {
-              console.log(pokemon)
               return (
                 <React.Fragment key={`${o.nickname}-${o.catch_date}`}>
                   <div className="pokemon__catchdate">{new Date(o.catch_date).toLocaleString('en-US', {

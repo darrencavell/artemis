@@ -1,58 +1,87 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, createRef } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import PokemonCard from '../components/PokemonCard'
 
 import PokemonStore from '../stores/PokemonStore'
-import { colorByPokemonType } from '../utils'
+import { colorByPokemonType, createObserver } from '../utils'
 import { fetchPokemon } from '../actions/PokemonAction'
 import useInfiniteScrolling from '../utils/useInfiniteScrolling'
 
 import './Home.css'
 
 const Home = props => {
+  const history = useHistory()
   const [pokemonLists, setPokemonLists] = useState([])
+  const [imageObserver, setImageObserver] = useState(null)
 
-  const [isFetching, setIsFetching] = useInfiniteScrolling(fetchMorePokemon)
+  const [isFetching, setIsFetching, clear] = useInfiniteScrolling(fetchMorePokemon)
   function fetchMorePokemon() {
     setTimeout(() => {
       fetchPokemon({ query: `?limit=${PokemonStore.data.limit}&offset=${PokemonStore.data.loaded}` })
-      setIsFetching(false)
     }, 3000)
   }
 
+  function onImageInView(entries, observer) {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const element = entry.target
+        const imageSrc = element.getAttribute('data-src')
+        
+        element.removeAttribute('data-src')
+        element.setAttribute('src', imageSrc)
+        
+        observer.unobserve(element)
+      } 
+    })
+  }
+
   useEffect(() => {
-    fetchPokemon()
+    PokemonStore.data.loaded === 0
+      ? fetchPokemon({ query: `?limit=10&offset=${PokemonStore.data.loaded}` })
+      : setPokemonLists(PokemonStore.getExistingPokemon())
+    const imageObserver = createObserver(onImageInView) 
+    setImageObserver(imageObserver)
     PokemonStore.on('change', updateFromStore)
     return () => {
+      clear()
+      setIsFetching(false)
+      imageObserver.disconnect()
       PokemonStore.removeListener('change', updateFromStore)
     }
   }, [])
   function updateFromStore() {
-    if(!isFetching)
+    if(!isFetching) {
       setPokemonLists(prevState => prevState.concat(PokemonStore.getPokemon()))
+      setIsFetching(false)
+    }
   }
 
   const PokemonNotification = props => {
     const { isFetching } = props
     const toggle = isFetching ? 'show' : 'hide'
-    
+
     return (
-      <div className={`pokemon__notification ${toggle}`}>Fetching more pokemons...</div>
+      <div className={`pokemon__notification ${toggle}`}>
+        Fetching more pokemons
+      </div>
     )
   }
 
   const PokemonCardModified = props => {
-    const { pokemonLists } = props
+    const { pokemonLists, observer } = props
 
     return pokemonLists.map(pokemon => {
-      const { id, types } = pokemon
+      const { id, types, name } = pokemon
       const color = colorByPokemonType(types[types.length - 1].type.name)
 
       return (
         <PokemonCard
           key={id}
           pokemon={pokemon}
-          color={color} />
+          color={color}
+          observer={observer}
+          callback={() => history.push(`/${name}`)} />
       )
     })
   }
@@ -62,6 +91,7 @@ const Home = props => {
       <h1 className="headliner">Artemis Pokedex</h1>
       <div className="swiper">
         <PokemonCardModified
+          observer={imageObserver}
           pokemonLists={pokemonLists} />
       </div>
       <PokemonNotification
