@@ -47,7 +47,13 @@ module.exports = {
     }),
     new WorkboxWebpackPlugin.InjectManifest({
       swSrc: "./src/sw-src.js",
-      swDest: "sw.js"
+      swDest: "sw.js",
+      exclude: [/\.map$/, /manifest.*\.json$/, /_redirects/]
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
     })
   ]
 }

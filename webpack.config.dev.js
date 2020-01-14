@@ -56,16 +56,25 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     disableHostCheck: true,
-    port: 8080
+    port: 8081
   },
   plugins: [
+    new CopyWebpackPlugin([{
+      from: "./public"
+    }]),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
       filename: "index.html"
     }),
     new WorkboxWebpackPlugin.InjectManifest({
       swSrc: "./src/sw-src.js",
-      swDest: "sw.js"
+      swDest: "sw.js",
+      exclude: [/\.map$/, /manifest.*\.json$/, /_redirects/]
+    }),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
     })
   ],
   optimization: {
