@@ -38,13 +38,13 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    // new HtmlWebPackPlugin({
-    //   template: "./src/index.html",
-    //   filename: "index.html"
-    // }),
     new CopyWebpackPlugin([{
       from: "./public"
     }]),
+    new HtmlWebPackPlugin({
+      template: "./public/index.html",
+      filename: "index.html"
+    }),
     new WorkboxWebpackPlugin.InjectManifest({
       swSrc: "./src/sw-src.js",
       swDest: "sw.js"
