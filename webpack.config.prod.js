@@ -1,16 +1,17 @@
 const webpack = require('webpack')
 const path = require('path')
 const HtmlWebPackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: { main: path.join(__dirname, './src/index.js') },
   output: {
-    path: path.resolve(__dirname, 'build'),
-    filename: 'bundle[chunkhash:8].js',
-    publicPath: '/'
+    path: path.resolve(__dirname, './dist'),
+    filename: 'bundle[chunkhash:4].js',
+    publicPath: '/assets'
   },
   mode: 'production',
-  mode: 'development',
   module: {
     rules: [
       {
@@ -19,6 +20,10 @@ module.exports = {
         use: {
           loader: "babel-loader"
         }
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       },
       {
         test: /\.html$/,
@@ -31,9 +36,14 @@ module.exports = {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebPackPlugin({
       template: "./src/index.html",
       filename: "./index.html"
+    }),
+    new WorkboxWebpackPlugin.InjectManifest({
+      swSrc: "./src/sw-src.js",
+      swDest: "sw.js"
     })
   ]
 }
