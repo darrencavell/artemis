@@ -82,6 +82,23 @@ const Detail = props => {
     )
   }
 
+  const PokemonMoves = props => {
+    const { moves } = props
+
+    return (
+      <div className="abouters">
+        <span className="pokemon__statname">Moves</span>
+        <div className="pokemon__status split">
+          {moves.map((m, index) => {
+            return (
+              <span key={m.move.name} className="pokemon__statvalue">{`${index + 1}. ${m.move.name.charAt(0).toUpperCase()}${m.move.name.substring(1)}`}</span>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
   const PokemonCatch = props => {
     const { pokemonDetail, isButtonClicked, setIsButtonClicked, types } = props
     const [name, setName] = useState('')
@@ -90,7 +107,12 @@ const Detail = props => {
     return isButtonClicked ? (
       <PokemonModal id="modal">
         <div className="pokemon__catch">
-          <div className="pokemon__dialayer" onClick={() => setIsButtonClicked(false)}></div>
+          <div className="pokemon__dialayer" onClick={() => {
+            if (!isCaught) {
+              setIsButtonClicked(false)
+              document.body.classList.remove('no-scroll')
+            }
+          }}></div>
           <div className="pokemon__dialog">
             {isCaught ? (
               <>
@@ -106,9 +128,12 @@ const Detail = props => {
             )}
             <PokemonButton
               color={color}
-              callback={() => isCaught
-                ? (tamePokemon({ detail: pokemonDetail, nickname: name, catch_date: new Date().getTime() }), setIsButtonClicked(false))
-                : setIsButtonClicked(false)}>
+              callback={() => {
+                isCaught
+                  ? (tamePokemon({ detail: pokemonDetail, nickname: name, catch_date: new Date().getTime() }), setIsButtonClicked(false))
+                  : setIsButtonClicked(false)
+                document.body.classList.remove('no-scroll')
+              }}>
                 OK
             </PokemonButton>
           </div>
@@ -118,6 +143,7 @@ const Detail = props => {
   }
 
   function catchPokemon() {
+    document.body.classList.add('no-scroll')
     setIsButtonClicked(true)
     const chances = Math.random()
     
@@ -129,7 +155,7 @@ const Detail = props => {
   }
 
   if (isFetching) {
-    const { name, types, sprites, stats, height, weight, abilities } = pokemonDetail
+    const { name, types, sprites, stats, height, weight, abilities, moves } = pokemonDetail
     return (
       <div id="detail">
         <div className="headliner column" style={{ background: colorByPokemonType(types[types.length - 1].type.name) }}>
@@ -159,6 +185,8 @@ const Detail = props => {
             pokemonDetail={pokemonDetail}
             isButtonClicked={isButtonClicked}
             setIsButtonClicked={setIsButtonClicked} />
+          <PokemonMoves
+            moves={moves} />
           <PokemonButton
             color={colorTransform(colorByPokemonType(types[types.length - 1].type.name), 20)}
             callback={catchPokemon}>

@@ -51,6 +51,7 @@
 #detail .container {
   padding: 0 20px;
   min-height: calc(60vh - 40px);
+  margin-bottom: 30px;
 }
 
 #detail .abouters {
@@ -66,6 +67,14 @@
   align-items: center;
   font-size: 14px;
   font-weight: 600;
+  margin-top: 10px;
+}
+#detail .pokemon__status.split {
+  flex-wrap: wrap;
+}
+#detail .pokemon__status.split .pokemon__statvalue {
+  width: 50%;
+  flex: 50%;
   margin-top: 10px;
 }
 #detail .pokemon__statname {

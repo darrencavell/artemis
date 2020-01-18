@@ -104,6 +104,7 @@ const Pokedex = props => {
   return (
     <div id="pokedex" className="layout">
       <h1 className="headliner">Owned Pokedex</h1>
+      <p className="belowliner">Your Caught Pokemon</p>
       <div className="swiper">
         <PokemonCardModifiedComponent
           tamedPokemonLists={tamedPokemonLists} />

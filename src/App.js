@@ -10,6 +10,12 @@ import Detail from './views/Detail'
 import Pokedex from './views/Pokedex'
 import NotFound from './views/NotFound'
 
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+  })
+}
+
 const App = () => {
   return (
     <Router>

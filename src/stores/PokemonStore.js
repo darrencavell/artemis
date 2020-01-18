@@ -19,7 +19,8 @@ class PokemonStore extends EventEmitter {
       pokemon: [],
       fetchedPokemon: [],
       fetchedDetail: {},
-      tamedPokemon: []
+      tamedPokemon: [],
+      total: 0
     }
     this.indexedDB = {
       version: 1,
@@ -42,6 +43,9 @@ class PokemonStore extends EventEmitter {
         db.createObjectStore('artemis', {
           keyPath: ['id', 'name']
         })
+        db.createObjectStore('artemis-owned', {
+         keyPath: 'id'
+        })
       }
     })
     return this.indexedDB.idb
@@ -60,6 +64,10 @@ class PokemonStore extends EventEmitter {
   async tamePokemon(detail, nickname, catch_date) {
     this.indexedDB.idb = await this.getIdb()
     const existingDetail = await this.indexedDB.idb.get('artemis', [detail.id, detail.name])
+    const existingOwned = await this.indexedDB.idb.get('artemis-owned', 'total')
+    const valuePokemonTotal = existingOwned ? existingOwned.value : 0
+    await this.indexedDB.idb.put('artemis-owned', { id: 'total', value: valuePokemonTotal + 1 })
+    this.data.total = valuePokemonTotal + 1
     if (existingDetail == undefined) {
       const newDetail = Object.assign({}, detail)
       newDetail['owned'] = [{ nickname, catch_date }]
@@ -85,6 +93,10 @@ class PokemonStore extends EventEmitter {
   async untamePokemon(id, name, nickname) {
     this.indexedDB.idb = await this.getIdb()
     const existingDetail = await this.indexedDB.idb.get('artemis', [id, name])
+    const existingOwned = await this.indexedDB.idb.get('artemis-owned', 'total')
+    const valuePokemonTotal = existingOwned ? existingOwned.value : 0
+    await this.indexedDB.idb.put('artemis-owned', { id: 'total', value: valuePokemonTotal - 1 })
+    this.data.total = valuePokemonTotal - 1
     if (existingDetail !== undefined) {
       const newDetail = Object.assign({}, existingDetail)
       newDetail['owned'] = newDetail['owned'].filter(f => f.nickname !== nickname)
@@ -102,13 +114,23 @@ class PokemonStore extends EventEmitter {
   getTamePokemon() {
     return this.data.tamedPokemon
   }
+  async getTotalPokemonIdbAsync() {
+    this.indexedDB.idb = await this.getIdb()
+
+    const existingOwned = await this.indexedDB.idb.get('artemis-owned', 'total')
+    this.data.total = existingOwned ? existingOwned.value : 0
+    this.emit('total')
+  }
+  getTotalPokemon() {
+    return this.data.total
+  }
   /**
    * `Fetch Pokemon`
    * - fetch from pokeapi.co
    * @param {QueryString} query 
    */
   fetchPokemon(query = `?limit=${this.data.limit}`) {
-    axios.get(`https://pokeapi.co/api/v2/pokemon${query}`)
+    axios.get(`${process.env.API_URL}/pokemon${query}`)
       .then(response => {
         const { status, data } = response
         if(status !== 200) {
@@ -116,7 +138,7 @@ class PokemonStore extends EventEmitter {
         }
 
         const { results } = data
-        axios.all(results.map(pokemon => axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)))
+        axios.all(results.map(pokemon => axios.get(`${process.env.API_URL}/pokemon/${pokemon.name}`)))
           .then(response => {
             this.data.loaded += response.length
             this.data.fetchedPokemon = response.map(r => r.data)
@@ -132,7 +154,7 @@ class PokemonStore extends EventEmitter {
     return this.data.pokemon
   }
   fetchPokemonDetail(searchedPokemon) {
-    axios.get(`https://pokeapi.co/api/v2/pokemon/${searchedPokemon}`)
+    axios.get(`${process.env.API_URL}/pokemon/${searchedPokemon}`)
       .then(response => {
         const { status, data } = response
         if(status !== 200) {

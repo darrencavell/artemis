@@ -16,6 +16,7 @@ import './Home.css'
 
 const Home = props => {
   const history = useHistory()
+  const [totalPokemon, setTotalPokemon] = useState(0)
   const [pokemonLists, setPokemonLists] = useState([])
   // const [imageObserver, setImageObserver] = useState(null)
 
@@ -24,6 +25,9 @@ const Home = props => {
     setTimeout(() => {
       fetchPokemon({ query: `?limit=${PokemonStore.data.limit}&offset=${PokemonStore.data.loaded}` })
     }, 3000)
+  }
+  function getTotalPokemon() {
+    setTotalPokemon(PokemonStore.getTotalPokemon())
   }
 
   // function onImageInView(entries, observer) {
@@ -44,12 +48,13 @@ const Home = props => {
     PokemonStore.data.loaded === 0
       ? fetchPokemon({ query: `?limit=10&offset=${PokemonStore.data.loaded}` })
       : setPokemonLists(PokemonStore.getExistingPokemon())
-    
+    PokemonStore.getTotalPokemonIdbAsync()
     // if ("IntersectionObserver" in window) {
     //   const observer = createObserver(onImageInView)
     //   setImageObserver(observer)
     // }
     PokemonStore.on('change', updateFromStore)
+    PokemonStore.on('total', getTotalPokemon)
     return () => {
       clear()
       setIsFetching(false)
@@ -57,6 +62,7 @@ const Home = props => {
       //   imageObserver.disconnect()
       // }
       PokemonStore.removeListener('change', updateFromStore)
+      PokemonStore.removeListener('total', getTotalPokemon)
     }
   }, [])
   function updateFromStore() {
@@ -98,6 +104,7 @@ const Home = props => {
   return (
     <div id="home" className="layout">
       <h1 className="headliner">Artemis Pokedex</h1>
+      <p className="belowliner">Pokemon Owned: {totalPokemon}</p>
       <div className="swiper">
         <PokemonCardModified
           // observer={imageObserver}

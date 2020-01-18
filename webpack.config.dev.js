@@ -3,6 +3,13 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
+const dotenv = require('dotenv')
+
+const env = dotenv.config().parsed;
+const envKeys = Object.keys(env).reduce((prev, next) => {
+  prev[`process.env.${next}`] = JSON.stringify(env[next]);
+  return prev;
+}, {});
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
@@ -60,8 +67,7 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     disableHostCheck: true,
-    port: 8081,
-    host: '0.0.0.0'
+    port: 8081
   },
   plugins: [
     new CopyWebpackPlugin([{
@@ -76,11 +82,7 @@ module.exports = {
       swDest: "sw.js",
       exclude: [/\.map$/, /manifest.*\.json$/, /_redirects/]
     }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('production')
-      }
-    })
+    new webpack.DefinePlugin(envKeys)
   ],
   optimization: {
     minimize: true
