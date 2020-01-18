@@ -4,13 +4,6 @@ const HtmlWebPackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
-const dotenv = require('dotenv')
-
-const env = dotenv.config().parsed;
-const envKeys = Object.keys(env).reduce((prev, next) => {
-  prev[`process.env.${next}`] = JSON.stringify(env[next]);
-  return prev;
-}, {});
 
 module.exports = {
   entry: ['babel-polyfill', './src/index.js'],
