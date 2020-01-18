@@ -4,7 +4,14 @@ import PokemonType from './PokemonType'
 import PokemonImage from './PokemonImage'
 
 const PokemonCard = props => {
-  const { pokemon, color, minibar, additional, callback, observer } = props
+  const {
+    pokemon,
+    color,
+    minibar,
+    additional,
+    callback,
+    // observer
+  } = props
   const { sprites, types, name } = pokemon
 
   const MiniBarComponent = minibar ? minibar(pokemon) : null
@@ -14,8 +21,8 @@ const PokemonCard = props => {
     <div className="pokemon__card" style={{ background: color }}>
       <div onClick={callback}>
         <PokemonImage
-          isLazy
-          observer={observer}
+          // isLazy={false}
+          // observer={observer}
           src={sprites.front_default} />
         <div className="pokemon__description">
           <div>

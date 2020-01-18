@@ -3,9 +3,14 @@ import { useHistory } from 'react-router-dom'
 
 import PokemonCard from '../components/PokemonCard'
 import PokemonButton from '../components/PokemonButton'
+import PokemonMenu from '../components/PokemonMenu'
 
 import PokemonStore from '../stores/PokemonStore'
-import { colorByPokemonType, colorTransform, createObserver } from '../utils'
+import {
+  colorByPokemonType,
+  colorTransform,
+  // createObserver
+} from '../utils'
 import { untamePokemon } from '../actions/PokemonAction'
 
 import './Pokedex.css'
@@ -13,30 +18,35 @@ import './Pokedex.css'
 const Pokedex = props => {
   const history = useHistory()
   const [tamedPokemonLists, setTamedPokemonLists] = useState([])
-  const [imageObserver, setImageObserver] = useState(null)
+  // const [imageObserver, setImageObserver] = useState(null)
 
-  function onImageInView(entries, observer) {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const element = entry.target
-        const imageSrc = element.getAttribute('data-src')
+  // function onImageInView(entries, observer) {
+  //   entries.forEach((entry) => {
+  //     if (entry.isIntersecting) {
+  //       const element = entry.target
+  //       const imageSrc = element.getAttribute('data-src')
         
-        element.removeAttribute('data-src')
-        element.setAttribute('src', imageSrc)
+  //       element.removeAttribute('data-src')
+  //       element.setAttribute('src', imageSrc)
         
-        observer.unobserve(element)
-      } 
-    })
-  }
+  //       observer.unobserve(element)
+  //     } 
+  //   })
+  // }
 
   useEffect(() => {
     PokemonStore.getTamePokemonFromIdbAsync()
     PokemonStore.on('change', getTamedPokemonFromStore)
     PokemonStore.on('delete', deletedTamePokemonFromStore)
-    const imageObserver = createObserver(onImageInView) 
-    setImageObserver(imageObserver)
+
+    // if ("IntersectionObserver" in window) {
+    //   const imageObserver = createObserver(onImageInView) 
+    //   setImageObserver(imageObserver)
+    // }
     return () => {
-      imageObserver.disconnect()
+      // if ("IntersectionObserver" in window) {
+      //   imageObserver.disconnect()
+      // }
       PokemonStore.removeListener('change', getTamedPokemonFromStore)
       PokemonStore.removeListener('delete', deletedTamePokemonFromStore)
     }
@@ -62,14 +72,14 @@ const Pokedex = props => {
             pokemon={pokemon}
             color={color}
             callback={() => history.push(`/${name}`)}
-            observer={imageObserver}
+            // observer={imageObserver}
             additional={pokemon => {
               const { id, name, types } = pokemon
               const color = colorByPokemonType(types[types.length - 1].type.name)
 
               return (
                 <PokemonButton
-                  color={colorTransform(color, 20)}
+                  color={color}
                   callback={() => untamePokemon({ id, name, nickname: o.nickname })}>
                     ✖
                 </PokemonButton>
@@ -98,6 +108,7 @@ const Pokedex = props => {
         <PokemonCardModifiedComponent
           tamedPokemonLists={tamedPokemonLists} />
       </div>
+      <PokemonMenu />
     </div>
   )
 }

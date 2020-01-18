@@ -50,13 +50,18 @@ module.exports = {
             publicPath: '/'
           }
         }
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+        loader: 'url-loader'
       }
     ]
   },
   devServer: {
     historyApiFallback: true,
     disableHostCheck: true,
-    port: 8081
+    port: 8081,
+    host: '0.0.0.0'
   },
   plugins: [
     new CopyWebpackPlugin([{

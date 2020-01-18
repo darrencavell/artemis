@@ -2,9 +2,13 @@ import React, { useState, useEffect, useRef, createRef } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import PokemonCard from '../components/PokemonCard'
+import PokemonMenu from '../components/PokemonMenu'
 
 import PokemonStore from '../stores/PokemonStore'
-import { colorByPokemonType, createObserver } from '../utils'
+import {
+  colorByPokemonType,
+  // createObserver
+} from '../utils'
 import { fetchPokemon } from '../actions/PokemonAction'
 import useInfiniteScrolling from '../utils/useInfiniteScrolling'
 
@@ -13,7 +17,7 @@ import './Home.css'
 const Home = props => {
   const history = useHistory()
   const [pokemonLists, setPokemonLists] = useState([])
-  const [imageObserver, setImageObserver] = useState(null)
+  // const [imageObserver, setImageObserver] = useState(null)
 
   const [isFetching, setIsFetching, clear] = useInfiniteScrolling(fetchMorePokemon)
   function fetchMorePokemon() {
@@ -22,31 +26,36 @@ const Home = props => {
     }, 3000)
   }
 
-  function onImageInView(entries, observer) {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const element = entry.target
-        const imageSrc = element.getAttribute('data-src')
+  // function onImageInView(entries, observer) {
+  //   entries.forEach((entry) => {
+  //     if (entry.isIntersecting) {
+  //       const element = entry.target
+  //       const imageSrc = element.getAttribute('data-src')
         
-        element.removeAttribute('data-src')
-        element.setAttribute('src', imageSrc)
+  //       element.removeAttribute('data-src')
+  //       element.setAttribute('src', imageSrc)
         
-        observer.unobserve(element)
-      } 
-    })
-  }
+  //       observer.unobserve(element)
+  //     } 
+  //   })
+  // }
 
   useEffect(() => {
     PokemonStore.data.loaded === 0
       ? fetchPokemon({ query: `?limit=10&offset=${PokemonStore.data.loaded}` })
       : setPokemonLists(PokemonStore.getExistingPokemon())
-    const imageObserver = createObserver(onImageInView) 
-    setImageObserver(imageObserver)
+    
+    // if ("IntersectionObserver" in window) {
+    //   const observer = createObserver(onImageInView)
+    //   setImageObserver(observer)
+    // }
     PokemonStore.on('change', updateFromStore)
     return () => {
       clear()
       setIsFetching(false)
-      imageObserver.disconnect()
+      // if ("IntersectionObserver" in window) {
+      //   imageObserver.disconnect()
+      // }
       PokemonStore.removeListener('change', updateFromStore)
     }
   }, [])
@@ -80,7 +89,7 @@ const Home = props => {
           key={id}
           pokemon={pokemon}
           color={color}
-          observer={observer}
+          // observer={observer}
           callback={() => history.push(`/${name}`)} />
       )
     })
@@ -91,11 +100,12 @@ const Home = props => {
       <h1 className="headliner">Artemis Pokedex</h1>
       <div className="swiper">
         <PokemonCardModified
-          observer={imageObserver}
+          // observer={imageObserver}
           pokemonLists={pokemonLists} />
       </div>
       <PokemonNotification
         isFetching={isFetching} />
+      <PokemonMenu />
     </div>
   )
 }

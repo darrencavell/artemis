@@ -1,1 +1,0 @@
-jest.mock('../images/gray.jpeg', () => 'gray.jpeg');

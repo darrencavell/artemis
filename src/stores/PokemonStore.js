@@ -102,6 +102,11 @@ class PokemonStore extends EventEmitter {
   getTamePokemon() {
     return this.data.tamedPokemon
   }
+  /**
+   * `Fetch Pokemon`
+   * - fetch from pokeapi.co
+   * @param {QueryString} query 
+   */
   fetchPokemon(query = `?limit=${this.data.limit}`) {
     axios.get(`https://pokeapi.co/api/v2/pokemon${query}`)
       .then(response => {
@@ -136,6 +141,11 @@ class PokemonStore extends EventEmitter {
 
         this.data.fetchedDetail = data
         this.emit('change')
+      })
+      .catch(error => {
+        if (error.response) {
+          window.location.href = '/not-found'
+        }
       })
   }
   getPokemonDetail() {
