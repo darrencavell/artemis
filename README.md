@@ -34,3 +34,5 @@ Page consists of:
 - Not Found `/not-found`
 
 Deployed Site: https://artemis-pokedex.netlify.com
+
+Github: https://github.com/darrencavell/artemis
