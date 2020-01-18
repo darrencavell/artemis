@@ -61,11 +61,6 @@ module.exports = {
       swDest: "sw.js",
       exclude: [/\.map$/, /manifest.*\.json$/, /_redirects/]
     }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('production')
-      }
-    }),
     new webpack.DefinePlugin(envKeys)
   ]
 }
