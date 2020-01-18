@@ -39,7 +39,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --open --config webpack.config.dev.js --mode development",
-    "build": "rm -rf build && NODE_ENV=production webpack --config webpack.config.prod.js --mode production",
+    "build": "rm -rf build && webpack --config webpack.config.prod.js --mode production",
     "analyze": "NODE_ENV=production webpack --config webpack.config.prod.js --profile --json > stats-prod.json && webpack-bundle-analyzer stats-prod.json dist/",
     "test": "jest --config jest.config.json --verbose",
     "test:watch": "jest --watchAll --verbose",
